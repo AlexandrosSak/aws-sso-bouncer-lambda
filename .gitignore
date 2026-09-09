@@ -1,0 +1,6 @@
+main
+*.zip
+*.out
+.env
+.DS_Store
+.vscode/

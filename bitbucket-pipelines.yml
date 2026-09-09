@@ -1,0 +1,33 @@
+image:
+  name: golang:1.20.3
+
+definitions:
+  steps:
+    - step: &build
+        name: Build
+        script:
+          - apt-get update
+          - apt-get install zip -y
+          - make build
+        artifacts:
+          - lambda/*/package.zip
+
+    - step: &deploy
+        name: Deploy
+        caches:
+          - pip
+        script:
+          - apt-get update
+          - apt-get install awscli -y
+          - AWS_REGION=eu-west-1 make deploy
+          - AWS_REGION=eu-west-2 make deploy
+          - AWS_REGION=us-west-2 make deploy
+
+pipelines:
+  default:
+    - step: *build
+
+  branches:
+    main:
+      - step: *build
+      - step: *deploy
