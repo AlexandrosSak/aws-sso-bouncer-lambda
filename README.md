@@ -1,4 +1,6 @@
-A serverless access management utility built in Go and deployed to AWS Lambda across multiple regions via Bitbucket Pipelines. 
+# AWS SSO Bouncer Lambda
+
+A serverless access management utility built in Go and deployed to AWS Lambda across multiple regions via Bitbucket Pipelines.
 
 It provides temporary, dynamic IP allowlisting for AWS Security Groups and automatically revokes non-standard access rules at the end of the day to maintain a least-privilege security posture.
 
@@ -10,6 +12,8 @@ It provides temporary, dynamic IP allowlisting for AWS Security Groups and autom
 
 ## Project Structure
 
+```text
+.
 ├── bitbucket-pipelines.yml  # CI/CD pipeline definition
 ├── go.mod                  # Go module dependencies
 ├── go.sum                  # Dependency checksums
@@ -20,37 +24,43 @@ It provides temporary, dynamic IP allowlisting for AWS Security Groups and autom
 │       └── bouncer-update.go # Dynamic IP access function
 ├── Makefile                # Build and deployment targets
 └── README.md
+```
 
-Environment Variables
+## Environment Variables
 
 Both Lambda functions require the following environment variables:
 
-BOUNCER_REGION              Target AWS Region (defaults to eu-west-1 if unset)
-BOUNCER_SECURITY_GROUP_ID   Target AWS Security Group ID to manage
-ACCOUNT_NAME                Display name of the AWS Account for UI responses (bouncer-update)
+| Variable | Description |
+| :--- | :--- |
+| **`BOUNCER_REGION`** | Target AWS Region (defaults to `eu-west-1` if unset) |
+| **`BOUNCER_SECURITY_GROUP_ID`** | Target AWS Security Group ID to manage |
+| **`ACCOUNT_NAME`** | Display name of the AWS Account for UI responses (`bouncer-update`) |
 
-Local Development & Build
-Prerequisites
+## Local Development & Build
 
-Go 1.20+
+### Prerequisites
 
-zip utility
+- Go 1.20+
+- `zip` utility
+- AWS CLI configured with active credentials
 
-aws-cli configured with active credentials
+### Commands
 
-Commands
-Compile the Go binaries and build the deployment .zip packages:
+Compile the Go binaries and build the deployment `.zip` packages:
 
+```bash
 make build
+```
 
 Deploy updated packages manually to a specific region:
 
+```bash
 AWS_REGION=eu-west-1 make deploy
+```
 
+## CI/CD Pipeline
 
-CI/CD Pipeline
-The included bitbucket-pipelines.yml handles deployment automatically:
+The included `bitbucket-pipelines.yml` handles deployment automatically:
 
-Build Step: Uses golang:1.20.3 container to run make build, archiving .zip packages as build artifacts.
-
-Deploy Step: Triggered on pushes to main. Invokes make deploy across eu-west-1, eu-west-2, and us-west-2.
+- **Build Step**: Uses `golang:1.20.3` container to run `make build`, archiving `.zip` packages as build artifacts.
+- **Deploy Step**: Triggered on pushes to `main`. Invokes `make deploy` across `eu-west-1`, `eu-west-2`, and `us-west-2`.
